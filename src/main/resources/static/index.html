@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script src="jquery-3.5.0.js"></script>
+
+<script>
+$(function () {
+
+    $("#addPizza").hide();
+    $("#openOrderPizza").click(function () {
+        $("#pizzaInformation").hide();
+        $("#updatePizza").hide();
+        $("#deletePizza").hide();
+        $("#getOnePizza").hide();
+        $("#getAllPizzaBySize").hide();
+        $("#getAllPizzaByStatus").hide();
+        if($("#addPizza").is(":hidden")){
+            $("#addPizza").show();
+        }else{
+            $("#addPizza").hide();
+        }
+    });
+
+    $("#updatePizza").hide();
+    $("#openUpdatePizza").click(function () {
+        $("#pizzaInformation").hide();
+        $("#addPizza").hide();
+        $("#deletePizza").hide();
+        $("#getOnePizza").hide();
+        $("#getAllPizzaBySize").hide();
+        $("#getAllPizzaByStatus").hide();
+        if($("#updatePizza").is(":hidden")){
+            $("#updatePizza").show();
+        }else{
+            $("#updatePizza").hide();
+        }
+    });
+
+    $("#deletePizza").hide();
+    $("#openDeletePizza").click(function () {
+        $("#pizzaInformation").hide();
+        $("#addPizza").hide();
+        $("#updatePizza").hide();
+        $("#getOnePizza").hide();
+        $("#getAllPizzaBySize").hide();
+        $("#getAllPizzaByStatus").hide();
+        if($("#deletePizza").is(":hidden")){
+            $("#deletePizza").show();
+        }else{
+            $("#deletePizza").hide();
+        }
+    });
+
+    $("#getOnePizza").hide();
+    $("#openGetOnePizza").click(function () {
+        $("#pizzaInformation").hide();
+        $("#addPizza").hide();
+        $("#updatePizza").hide();
+        $("#deletePizza").hide();
+        $("#getAllPizzaBySize").hide();
+        $("#getAllPizzaByStatus").hide();
+        if($("#getOnePizza").is(":hidden")){
+            $("#getOnePizza").show();
+        }else{
+            $("#getOnePizza").hide();
+        }
+    });
+
+    $("#getAllPizzaBySize").hide();
+    $("#openGetAllPizzaSize").click(function () {
+        $("#pizzaInformation").hide();
+        $("#addPizza").hide();
+        $("#updatePizza").hide();
+        $("#deletePizza").hide();
+        $("#getOnePizza").hide();
+        $("#getAllPizzaByStatus").hide();
+        if($("#getAllPizzaBySize").is(":hidden")){
+            $("#getAllPizzaBySize").show();
+        }else{
+            $("#getAllPizzaBySize").hide();
+        }
+    });
+
+    $("#getAllPizzaByStatus").hide();
+    $("#openGetAllPizzaStatus").click(function () {
+        $("#pizzaInformation").hide();
+        $("#addPizza").hide();
+        $("#updatePizza").hide();
+        $("#deletePizza").hide();
+        $("#getOnePizza").hide();
+        $("#getAllPizzaBySize").hide();
+        if($("#getAllPizzaByStatus").is(":hidden")){
+            $("#getAllPizzaByStatus").show();
+        }else{
+            $("#getAllPizzaByStatus").hide();
+        }
+    });
+
+    $("#submitOrderButton").click(function () {
+        let counter = 0;
+        let pizza = {
+            size:$("#pizzaSize").val(),
+            topping: [],
+            status:"New"
+        };
+        for(let i =1; i<=6; i++){
+            if($("#checkBox"+i).is(':checked')){
+                pizza.topping[counter] = $("#checkBox"+i).val();
+                counter++;
+                }
+        }
+        $.ajax({
+            url:"/pizzas",
+            type:"POST",
+            data:JSON.stringify(pizza),
+            contentType:"application/json",
+            success:function (newOrder) {
+                alert(newOrder)
+            },
+            error:function (err) {
+                alert(err.responseText);
+            }
+        })
+
+    });
+
+    $("#updateOrderButton").click(function () {
+        let counter = 0;
+        let pizza = {
+            number:$("#pizzaId").val(),
+            topping: [],
+            status:$("#pizzaStatus").val()
+        };
+        for(let i =1; i<=6; i++){
+            if($("#updateBox"+i).is(':checked')){
+                pizza.topping[counter] = $("#updateBox"+i).val();
+                counter++;
+            }
+        }
+        $.ajax({
+            url:"/pizzas/update",
+            type:"POST",
+            data:JSON.stringify(pizza),
+            contentType:"application/json",
+            success:function (updateOrder) {
+                alert(updateOrder)
+            },
+            error:function (err) {
+                alert(err.responseText);
+            }
+        })
+    });
+
+    $("#deletePizzaButton").click(function () {
+        $.ajax({
+            url:"/pizzas?pizzaId=" + $("#pizzaId2").val(),
+            type:"DELETE",
+            success:function (result) {
+                alert(result)
+            },
+            error:function (err) {
+                alert(err.responseText);
+            }
+        })
+    });
+
+    $("#getOnePizzaButton").click(function () {
+        $("#pizzaInformation").show();
+        $.ajax({
+            url:"/pizzas/one?pizzaId=" + $("#pizzaId3").val(),
+            success:function (onePizza) {
+                if(onePizza.topping == "")
+                    onePizza.topping = "none";
+
+                $("#pizzaInformation").html("");
+                $("#pizzaInformation").append("<b><u>pizza id:</u> </b>" + onePizza.number + "<b> <u>pizza size:</u> </b> " + onePizza.size + " <b> <u>toppings:</u> </b> "
+                    + onePizza.topping + " <b> <u>pizza price:</u> </b> " + onePizza.price + " <b> <u>status:</u> </b> " + onePizza.status);
+            },
+            error: function (Error) {
+                alert(Error.responseText);
+            }
+        })
+    });
+
+    $("#openGetAllPizza").click(function () {
+        $("#pizzaInformation").show();
+        $.ajax({
+            url:"/pizzas/all",
+            success:function (pizzas) {
+                $("#pizzaInformation").html("");
+                for(let i = 0; pizzas.length; i++){
+                    if(pizzas[i].topping == "")
+                        pizzas[i].topping = "none";
+                    $("#pizzaInformation").append("<b><u>pizza id:</u> </b>" + pizzas[i].number+ "<b> <u>pizza size:</u> </b> " + pizzas[i].size + " <b> <u>toppings:</u> </b> "
+                        + pizzas[i].topping + " <b> <u>pizza price:</u> </b> " + pizzas[i].price + " <b> <u>status:</u> </b> " + pizzas[i].status + "<br/><br/>");
+                }
+            }
+        })
+    });
+
+    $("#getPizzaSize").click(function () {
+        $("#pizzaInformation").show();
+        $.ajax({
+            url:"/pizzas/size?size=" + $("#pizzaSize2").val(),
+            success:function (pizzas) {
+                $("#pizzaInformation").html("");
+                for(let i = 0; pizzas.length; i++){
+                    if(pizzas[i].topping == "")
+                        pizzas[i].topping = "none";
+                    $("#pizzaInformation").append("<b><u>pizza id:</u> </b>" + pizzas[i].number+ "<b> <u>pizza size:</u> </b> " + pizzas[i].size + " <b> <u>toppings:</u> </b> "
+                        + pizzas[i].topping + " <b> <u>pizza price:</u> </b> " + pizzas[i].price + " <b> <u>status:</u> </b> " + pizzas[i].status + "<br/><br/>");
+                }
+            }
+        })
+    });
+
+    $("#getPizzaStatus").click(function () {
+        $("#pizzaInformation").show();
+        $.ajax({
+            url:"/pizzas/status?status=" + $("#pizzaStatus2").val(),
+            success:function (pizzas) {
+                $("#pizzaInformation").html("");
+                for(let i = 0; pizzas.length; i++){
+                    if(pizzas[i].topping == "")
+                        pizzas[i].topping = "none";
+                    $("#pizzaInformation").append("<b><u>pizza id:</u> </b>" + pizzas[i].number+ "<b> <u>pizza size:</u> </b> " + pizzas[i].size + " <b> <u>toppings:</u> </b> "
+                        + pizzas[i].topping + " <b> <u>pizza price:</u> </b> " + pizzas[i].price + " <b> <u>status:</u> </b> " + pizzas[i].status + "<br/><br/>");
+                }
+            }
+        })
+    });
+
+
+
+
+})
+
+
+
+</script>
+<style>
+    form{
+        display: inline-block;
+    }
+    #pizzaInformation{
+        display: inline-block;
+        text-align: center;
+        left: 0;
+        /*margin-top: -50px;*/
+        position: absolute;
+        top: 25%;
+        width: 100%;
+    }
+
+</style>
+
+<body>
+<h1>pizza!!!!</h1>
+<br/><br/>
+<button id="openOrderPizza">order pizza</button>
+<button id="openUpdatePizza">update pizza</button>
+<button id="openDeletePizza">delete pizza</button>
+<button id="openGetOnePizza">get one pizza status</button>
+<button id="openGetAllPizza">get all pizza status</button>
+<button id="openGetAllPizzaSize">get all pizza by size</button>
+<button id="openGetAllPizzaStatus">get all pizza by status</button>
+
+<br/><br/>
+
+<form id="addPizza" >
+    <h2>order pizza!</h2>
+    <h3>pizza size</h3>
+    <select id="pizzaSize" style="vertical-align: top">
+        <option value="small">small - 20 nis</option>
+        <option value="medium">medium - 25 nis</option>
+        <option value="large">large - 30 nis</option>
+    </select>
+
+    <br/>
+    <h3>choose topping! (2 nis for each one)</h3>
+        <input type="checkbox" id="checkBox1" value="green olive"  >green olive</input><br/>
+        <input type="checkbox" id="checkBox2" value="black olive">black olive</input><br/>
+        <input type="checkbox" id="checkBox3" value="mushrooms">mushrooms</input><br/>
+        <input type="checkbox" id="checkBox4" value="bacon">bacon</input><br/>
+        <input type="checkbox" id="checkBox5" value="pepperoni">pepperoni</input><br/>
+        <input type="checkbox" id="checkBox6" value="onion">onions</input><br/>
+    <br/>
+    <input type="button" value="submit order" id="submitOrderButton" />
+</form>
+
+<form id="updatePizza">
+    <h2>update pizza!</h2>
+    <br/>
+    <input type="number" placeholder="pizza id" id="pizzaId" />
+    <br/>
+    <h3>choose topping! (2 nis for each one)</h3>
+    <input type="checkbox" id="updateBox1" value="green olive"  >green olive</input><br/>
+    <input type="checkbox" id="updateBox2" value="black olive">black olive</input><br/>
+    <input type="checkbox" id="updateBox3" value="mushrooms">mushrooms</input><br/>
+    <input type="checkbox" id="updateBox4" value="bacon">bacon</input><br/>
+    <input type="checkbox" id="updateBox5" value="pepperoni">pepperoni</input><br/>
+    <input type="checkbox" id="updateBox6" value="onion">onions</input><br/>
+    <br/>
+    <select id="pizzaStatus">
+        <option value="New">New</option>
+        <option value="inTheOven">in The Oven</option>
+        <option value="Done">Done</option>
+    </select>
+    <br/><br/>
+    <input type="button" value="update order" id="updateOrderButton" />
+</form>
+<form id="deletePizza">
+    <h2>delete pizza!</h2>
+    <br/>
+    <input type="number" placeholder="pizza id" id="pizzaId2" />
+    <br/><br/>
+    <input type="button" value="delete pizza" id="deletePizzaButton" />
+</form>
+
+<form id="getOnePizza">
+    <h2>pizza status!</h2>
+    <br/>
+    <input type="number" placeholder="pizza id" id="pizzaId3" />
+    <br/><br/>
+    <input type="button" value="get status" id="getOnePizzaButton" />
+</form>
+
+<form id="getAllPizzaBySize">
+    <h2>pizzas status!</h2>
+    <br/>
+    <select id="pizzaSize2">
+        <option value="small">small</option>
+        <option value="medium">medium</option>
+        <option value="large">large</option>
+    </select>
+    <br/><br/>
+    <input type="button" value="get status" id="getPizzaSize" />
+</form>
+
+<form id="getAllPizzaByStatus">
+    <h2>pizzas status!</h2>
+    <br/>
+    <select id="pizzaStatus2">
+        <option value="New">New</option>
+        <option value="inTheOven">in The Oven</option>
+        <option value="Done">Done</option>
+    </select>
+    <br/><br/>
+    <input type="button" value="get status" id="getPizzaStatus" />
+</form>
+<div id="pizzaInformation" ></div>
+
+
+
+</body>
+</html>
